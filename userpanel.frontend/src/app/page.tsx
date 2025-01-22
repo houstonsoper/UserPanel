@@ -1,12 +1,35 @@
 "use client"
 
 import Image from "next/image";
-import {RefObject, useRef} from "react";
+import {RefObject, useRef, useState} from "react";
 
 export default function Home() {
     const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement>(null);
-    const handleFormSubmit = () => {
+    const [isDetailsInvalid, setIsDetailsInvalid] = useState<boolean>(false); 
+    const [errorMessage, setErrorMessage] = useState<string>("");
+    const handleFormSubmit = (e: React.FormEvent ) => {
+        e.preventDefault();
+        setIsDetailsInvalid(false); //Clear current errors 
+        
+        if (formRef.current) {
+            const formData = new FormData(formRef.current);
 
+            //Check that passwords match, if not display an error
+            const password1 : FormDataEntryValue | null = formData.get("password1");
+            const password2 : FormDataEntryValue | null = formData.get("password2");
+            if (password1 !== password2) {
+                setErrorMessage("Passwords must match");
+                setIsDetailsInvalid(true);
+                return;
+            }
+            
+            //Create a newUser object from the form data 
+            const newUser = {
+                name: formData.get("username"),
+                email: formData.get("email"),
+                password: formData.get("password1")
+            }
+        }
     }
     return (
         <div className="container">
@@ -16,9 +39,14 @@ export default function Home() {
                     onSubmit={handleFormSubmit}
                     ref={formRef}
                 >
-                    <div className="pb-2">
+                    <div className="pb-3">
                         <h1 className="text-2xl ">Create an account</h1>
                         <p className="text-gray-600">Please enter your details</p>
+                    </div>
+                    <div>
+                        {isDetailsInvalid ? (
+                            <p className="text-red-500">{errorMessage}</p>
+                        ) : null}
                     </div>
                     <div className="py-1">
                         <label htmlFor="username">Username</label>
@@ -37,7 +65,7 @@ export default function Home() {
                         <input className="w-full bg-gray-100" type="password" name="password2" required/>
                     </div>
                     <div className="flex justify-center pt-4">
-                        <button className="bg-blue-500 text-white font-semibold p-2 w-full">
+                        <button type="submit" className="bg-blue-500 text-white font-semibold p-2 w-full">
                             Register
                         </button>
                     </div>
