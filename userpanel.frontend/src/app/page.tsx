@@ -2,33 +2,32 @@
 
 import Image from "next/image";
 import {RefObject, useRef, useState} from "react";
+import {createUser, validateRegistrationForm} from "@/services/userService";
+import User from "@/interfaces/user";
 
 export default function Home() {
     const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement>(null);
     const [isDetailsInvalid, setIsDetailsInvalid] = useState<boolean>(false); 
-    const [errorMessage, setErrorMessage] = useState<string>("");
+    const [errors, setErrors] = useState<string[]>([]);
+    
     const handleFormSubmit = (e: React.FormEvent ) => {
         e.preventDefault();
         setIsDetailsInvalid(false); //Clear current errors 
         
         if (formRef.current) {
             const formData = new FormData(formRef.current);
-
-            //Check that passwords match, if not display an error
-            const password1 : FormDataEntryValue | null = formData.get("password1");
-            const password2 : FormDataEntryValue | null = formData.get("password2");
-            if (password1 !== password2) {
-                setErrorMessage("Passwords must match");
+            
+            //Check form data is valid and return any errors
+            const formErrors : string[] | null = validateRegistrationForm (formData);
+            if (formErrors) {
+                setErrors(formErrors);
                 setIsDetailsInvalid(true);
                 return;
             }
             
-            //Create a newUser object from the form data 
-            const newUser = {
-                name: formData.get("username"),
-                email: formData.get("email"),
-                password: formData.get("password1")
-            }
+            //Create user
+            const user : User = createUser(formData);
+            console.log(user);
         }
     }
     return (
@@ -45,7 +44,9 @@ export default function Home() {
                     </div>
                     <div>
                         {isDetailsInvalid ? (
-                            <p className="text-red-500">{errorMessage}</p>
+                            errors.map(e => (
+                                <p className="text-red-500">{e}</p>
+                            ))
                         ) : null}
                     </div>
                     <div className="py-1">
@@ -57,12 +58,12 @@ export default function Home() {
                         <input className="w-full bg-gray-100" type="email" name="email" required/>
                     </div>
                     <div className="py-1">
-                        <label htmlFor="password1">Password</label>
-                        <input className="w-full bg-gray-100" type="password" name="password1" required/>
+                        <label htmlFor="password">Password</label>
+                        <input className="w-full bg-gray-100" type="password" name="password" required/>
                     </div>
                     <div className="py-1">
-                        <label htmlFor="password2">Repeat password</label>
-                        <input className="w-full bg-gray-100" type="password" name="password2" required/>
+                        <label htmlFor="confirmPassword">Confirm password</label>
+                        <input className="w-full bg-gray-100" type="password" name="confirmPassword" required/>
                     </div>
                     <div className="flex justify-center pt-4">
                         <button type="submit" className="bg-blue-500 text-white font-semibold p-2 w-full">
