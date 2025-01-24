@@ -27,32 +27,34 @@ public class UserController : Controller
             return BadRequest(ModelState);
         }
 
+        //Attempt to create the user
         try
         {
             var user = await _userService.CreateUserAsync(userDto);
             if (user != null) 
-                return Ok("User created successfully");
+                return Ok(new { message = "User created successfully"});
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new {message = ex.Message});
         }
-        return BadRequest("Unable to create user.");
+        return BadRequest(new { message = "Unable to create user" });
     }
 
     [HttpPost ("/Login")]
     public async Task<IActionResult> Login([FromBody] UserLoginDto userLoginDto)
     {
+        //Attempt to log the user in
         try
         {
             var user = await _userService.LoginAsync(userLoginDto);
             if (user != null) 
-                return Ok("Logged in successfully");
+                return Ok(new { message = "Logged in successfully" });
         }
         catch (Exception ex)
         {
-            return Unauthorized(ex.Message);
+            return Unauthorized(new { message = ex.Message });
         }
-        return BadRequest("Unable to login.");
+        return BadRequest(new { message = "Unable to login." });
     }
 }

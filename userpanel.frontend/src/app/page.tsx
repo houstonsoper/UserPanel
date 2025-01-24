@@ -7,27 +7,34 @@ import User from "@/interfaces/user";
 
 export default function Home() {
     const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement>(null);
-    const [isDetailsInvalid, setIsDetailsInvalid] = useState<boolean>(false); 
+    const [isDetailsInvalid, setIsDetailsInvalid] = useState<boolean>(false);
     const [errors, setErrors] = useState<Error[]>([]);
-    
-    const handleFormSubmit = (e: React.FormEvent ) => {
+
+    const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsDetailsInvalid(false); //Clear current errors 
-        
+
         if (formRef.current) {
             const formData = new FormData(formRef.current);
-            
+
             //Check form data is valid and return any errors
-            const formErrors : Error[] | null = validateRegistrationForm (formData);
+            const formErrors: Error[] | null = validateRegistrationForm(formData);
             if (formErrors) {
                 setErrors(formErrors);
                 setIsDetailsInvalid(true);
                 return;
             }
-            
-            //Create user
-            const user : User = createUser(formData);
-            console.log(user);
+
+            //Attempt to create the user if validation passes
+            try {
+                const user: User | null = await createUser(formData);
+                console.log(user)
+            } catch (error) {
+                if (error instanceof Error) {
+                    setErrors([{name: "UserCreationError", message: error.message}]);
+                    setIsDetailsInvalid(true);
+                }
+            }
         }
     }
     return (
@@ -45,13 +52,17 @@ export default function Home() {
                     <div>
                         {isDetailsInvalid ? (
                             errors.map(e => (
-                                <p className="text-red-500" key={e.name}>{e.message}</p>
+                                <p className="text-red-500" key={e.name}> {e.message}</p>
                             ))
                         ) : null}
                     </div>
                     <div className="py-1">
-                        <label htmlFor="username">Username</label>
-                        <input className="w-full bg-gray-100" type="text" name="username" required/>
+                        <label htmlFor="forename">First name</label>
+                        <input className="w-full bg-gray-100" type="text" name="forename" required/>
+                    </div>
+                    <div className="py-1">
+                        <label htmlFor="surname">Surname</label>
+                        <input className="w-full bg-gray-100" type="text" name="surname" required/>
                     </div>
                     <div className="py-1">
                         <label htmlFor="email">Email</label>

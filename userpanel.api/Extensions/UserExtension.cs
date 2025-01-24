@@ -9,7 +9,8 @@ public static class UserExtension
     {
         return new UserRegistrationDto
         {
-            Username = user.Username,
+            Forename = user.Forename,
+            Surname = user.Surname,
             Email = user.Email,
             Password = user.Password
         };
@@ -20,7 +21,8 @@ public static class UserExtension
         return new UserRequestDto
         {
             UserId = user.UserId,
-            Username = user.Username,
+            Forename = user.Forename,
+            Surname = user.Surname,
             Email = user.Email,
             Password = user.Password
         };
@@ -30,7 +32,7 @@ public static class UserExtension
     {
         return new UserLoginDto
         {
-            Username = user.Username,
+            Email = user.Email,
             Password = user.Password
         };
     }
