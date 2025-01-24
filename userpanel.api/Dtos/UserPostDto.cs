@@ -1,12 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace userpanel.api.Models;
+namespace userpanel.api.Dtos;
 
-public class User
+public class UserPostDto
 {
-    public Guid UserId { get; set; } = Guid.NewGuid();
-    
     [Required (ErrorMessage = "Username is required")]
     [StringLength(15, ErrorMessage = "Username must be between 5 and 15 characters", MinimumLength = 5)]
     public required string Username { get; set; }
@@ -17,6 +14,5 @@ public class User
     
     [Required (ErrorMessage = "Password is required")]
     [StringLength(15, ErrorMessage = "Password must be between 5 and 15 characters", MinimumLength = 5)]
-    [NotMapped] 
     public required string Password { get; set; }
 }

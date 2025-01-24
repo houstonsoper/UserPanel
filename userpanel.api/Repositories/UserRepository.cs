@@ -11,8 +11,18 @@ public class UserRepository : IUserRepository
     {
         _context = context;
     }
-    public Task<User?> CreateUser(User user)
+    public async Task<User?> CreateUser(User user)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _context.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating user: {ex.Message}");
+            return null;
+        }
     }
 }
