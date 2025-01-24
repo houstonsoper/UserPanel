@@ -8,7 +8,7 @@ import User from "@/interfaces/user";
 export default function Home() {
     const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement>(null);
     const [isDetailsInvalid, setIsDetailsInvalid] = useState<boolean>(false); 
-    const [errors, setErrors] = useState<string[]>([]);
+    const [errors, setErrors] = useState<Error[]>([]);
     
     const handleFormSubmit = (e: React.FormEvent ) => {
         e.preventDefault();
@@ -18,7 +18,7 @@ export default function Home() {
             const formData = new FormData(formRef.current);
             
             //Check form data is valid and return any errors
-            const formErrors : string[] | null = validateRegistrationForm (formData);
+            const formErrors : Error[] | null = validateRegistrationForm (formData);
             if (formErrors) {
                 setErrors(formErrors);
                 setIsDetailsInvalid(true);
@@ -31,7 +31,7 @@ export default function Home() {
         }
     }
     return (
-        <div className="container">
+        <div className="container m-auto">
             <div className="flex justify-center h-screen">
                 <form
                     className="border border-gray-300 p-6 rounded-2xl m-auto"
@@ -45,7 +45,7 @@ export default function Home() {
                     <div>
                         {isDetailsInvalid ? (
                             errors.map(e => (
-                                <p className="text-red-500">{e}</p>
+                                <p className="text-red-500" key={e.name}>{e.message}</p>
                             ))
                         ) : null}
                     </div>

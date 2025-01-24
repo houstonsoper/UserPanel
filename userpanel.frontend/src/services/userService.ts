@@ -10,30 +10,30 @@ export function extractFormDate (form : FormData) : RegistrationDetails {
     return {username, email, password, confirmPassword} as RegistrationDetails
 }
 
-export function validateRegistrationForm(form : FormData) : string[] | null {
+export function validateRegistrationForm(form : FormData) : Error[] | null {
     const details : RegistrationDetails = extractFormDate(form);
-    let errors : string[] = [];
+    let errors : Error[] = [];
 
     //Check if username is between 5 and 15 characters
     if (details.username){
         if(details.username.length <= 5 || details.username.length > 15){
-            errors.push("Username must be between 5 and 15 characters");
+            errors.push({name: "InvalidUsernameLength", message: "Username must be between 5 and 15 characters"});
         }
     }
     //Check if email is between 5 and 254 characters
     if (details.email){
         if(details.email.length <= 5 || details.email.length > 254){
-            errors.push("Email must be between 5 and 254 characters");
+            errors.push({name: "InvalidEmailLength", message: "Email must be between 5 and 254 characters"});
         }
     }
     //Check that passwords match 
     //and that the password is between 5 and 15 characters
     if (details.password && details.confirmPassword){
         if(details.password !== details.confirmPassword){
-            errors.push("Passwords do not match");
+            errors.push({name: "PasswordMismatch", message: "Passwords do not match"});
         }
         if(details.password.length <= 5  || details.password.length > 15){
-            errors.push("Password must be between 5 and 15 characters");
+            errors.push({name: "InvalidPasswordLength", message: "Password must be between 5 and 15 characters"});
         }
     }
     
