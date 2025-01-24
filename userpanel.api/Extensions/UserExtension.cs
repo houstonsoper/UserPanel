@@ -5,9 +5,9 @@ namespace userpanel.api.Extensions;
 
 public static class UserExtension 
 {
-    public static UserPostDto ToUserPostDto(this User user)
+    public static UserRegistrationDto ToUserRegistrationDto(this User user)
     {
-        return new UserPostDto
+        return new UserRegistrationDto
         {
             Username = user.Username,
             Email = user.Email,
@@ -22,6 +22,15 @@ public static class UserExtension
             UserId = user.UserId,
             Username = user.Username,
             Email = user.Email,
+            Password = user.Password
+        };
+    }
+
+    public static UserLoginDto ToUserLoginDto(this User user)
+    {
+        return new UserLoginDto
+        {
+            Username = user.Username,
             Password = user.Password
         };
     }

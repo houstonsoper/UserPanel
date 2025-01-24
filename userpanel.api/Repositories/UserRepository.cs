@@ -1,4 +1,5 @@
-﻿using userpanel.api.Contexts;
+﻿using Microsoft.EntityFrameworkCore;
+using userpanel.api.Contexts;
 using userpanel.api.Models;
 
 namespace userpanel.api.Repositories;
@@ -11,18 +12,22 @@ public class UserRepository : IUserRepository
     {
         _context = context;
     }
-    public async Task<User?> CreateUser(User user)
+
+    public async Task<User?> CreateUserAsync(User user)
     {
-        try
-        {
-            await _context.AddAsync(user);
-            await _context.SaveChangesAsync();
-            return user;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error creating user: {ex.Message}");
-            return null;
-        }
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+        return user;
+    }
+
+    public async Task<User?> GetUserByUsernameAsync(string username)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        return user;
+    }
+    public async Task<User?> GetUserByEmailAsync(string email)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return user;
     }
 }
