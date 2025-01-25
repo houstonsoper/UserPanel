@@ -82,7 +82,7 @@ public class UserController : Controller
         try
         {
             var user = await _userService.GetUserByIdAsync(userId); 
-            return Ok(new {email = user.Email});
+            return Ok(user.ToUserRequestDto());
         }
         catch (Exception ex)
         {
