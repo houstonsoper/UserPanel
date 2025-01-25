@@ -1,5 +1,6 @@
 ﻿import RegistrationDetails from "@/interfaces/registrationDetails";
 import User from "@/interfaces/user";
+import LoginDetails from "@/interfaces/loginDetails";
 
 export function extractFormDate (form : FormData) : RegistrationDetails {
     const forename : string | undefined = form.get('forename')?.toString();
@@ -52,21 +53,63 @@ export function validateRegistrationForm(formData : FormData) : Error[] | null {
     return null
 }
 
+export function validateLoginForm(formData : FormData) : Error[] | null {
+    const details : RegistrationDetails = extractFormDate(formData);
+    let errors : Error[] = [];
+
+    //Check if an email has been entered
+    if (!details.email){
+        errors.push({name: "InvalidEmail", message: "Please enter your email"});
+    }
+
+    //Check if a password has been entered
+    if (!details.password){
+        errors.push({name: "InvalidPassword", message: "Please enter your password"});
+    }
+    
+    //Return any errors 
+    if (errors.length > 0){
+        return errors;
+    }
+
+    return null
+}
+
 export async function createUser(formData: FormData) : Promise<User | null> {
     const registrationDetails: RegistrationDetails = extractFormDate(formData);
-
-    const user: User = {
-        forename: registrationDetails.forename,
-        surname: registrationDetails.surname,
-        email: registrationDetails.email,
-        password: registrationDetails.password,
-    }
+    
     try {
         const url : string = "https://localhost:44378/Register"
         
         const response : Response = await fetch(url, {
             method: "POST",
-            body: JSON.stringify(user),
+            body: JSON.stringify(registrationDetails),
+            headers: {"Content-Type": "application/json"},
+        });
+        
+        if (!response.ok){
+            const errorData = await response.json();
+            throw new Error(errorData.message);
+        }
+        return response.json();
+    } catch (error) {
+        if(error instanceof Error){
+            console.error(error);
+            throw new Error(error.message);
+        }
+        return null;
+    }
+}
+
+export async function login (formData : FormData) : Promise<User | null> {
+    const loginDetails: LoginDetails = extractFormDate(formData);
+    
+    try {
+        const url : string = "https://localhost:44378/Login"
+        
+        const response : Response = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify(loginDetails),
             headers: {"Content-Type": "application/json"},
         });
         

@@ -44,6 +44,11 @@ public class UserController : Controller
     [HttpPost ("/Login")]
     public async Task<IActionResult> Login([FromBody] UserLoginDto userLoginDto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         //Attempt to log the user in
         try
         {
@@ -55,6 +60,6 @@ public class UserController : Controller
         {
             return Unauthorized(new { message = ex.Message });
         }
-        return BadRequest(new { message = "Unable to login." });
+        return BadRequest(new { message = "Unable to login" });
     }
 }
