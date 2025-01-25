@@ -1,21 +1,25 @@
 ﻿"use client"
 
-import {RefObject, useRef, useState} from "react";
+import {RefObject, useEffect, useRef, useState} from "react";
 import Link from "next/link";
-import {userLogin, validateLoginForm } from "@/services/userService";
+import {getUser, userLogin, validateLoginForm} from "@/services/userService";
 import User from "@/interfaces/user";
 import {useRouter} from "next/navigation";
+import {useUser} from "@/contexts/userContext";
 
 export default function LoginPage() {
     const formRef : RefObject<HTMLFormElement | null>= useRef<HTMLFormElement>(null);
     const [areDetailsInvalid, setAreDetailsInvalid] = useState<boolean>(false);
     const [errors, setErrors] = useState<Error[]>([]);
     const router  = useRouter();
-   
+    const { user, setUser } = useUser();
+
+    console.log("user", user);
+    
     const handleFormSubmit = async (e : React.FormEvent) => {
         e.preventDefault();
         setAreDetailsInvalid(false); //Clear current errors 
-        
+
         if (formRef.current) {
             const formData = new FormData(formRef.current);
 
@@ -26,11 +30,14 @@ export default function LoginPage() {
                 setAreDetailsInvalid(true);
                 return;
             }
-            
+
             //Attempt to log the user in 
             try{
-                const user : User | null = await userLogin(formData);
-                if (user) {
+                await userLogin(formData);
+                const loggedInUser : User | null = await getUser();
+                
+                if(loggedInUser){
+                    setUser(loggedInUser);
                     router.push("/");
                 }
             } catch (error){

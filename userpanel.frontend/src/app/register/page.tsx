@@ -1,17 +1,19 @@
 "use client"
 
 import Image from "next/image";
-import {RefObject, useRef, useState} from "react";
-import {createUser, validateRegistrationForm} from "@/services/userService";
+import {RefObject, useContext, useEffect, useRef, useState} from "react";
+import {createUser, getUser, validateRegistrationForm} from "@/services/userService";
 import User from "@/interfaces/user";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
+import {useUser} from "@/contexts/userContext";
 
 export default function Home() {
     const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement>(null);
     const [areDetailsInvalid, setAreDetailsInvalid] = useState<boolean>(false);
     const [errors, setErrors] = useState<Error[]>([]);
     const router = useRouter();
+    const { setUser } = useUser();
     
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,11 +29,15 @@ export default function Home() {
                 setAreDetailsInvalid(true);
                 return;
             }
-
-            //Attempt to create the user if validation passes
+            
             try {
-                const user: User | null = await createUser(formData);
-                if (user) {
+                //Attempt to create the user if validation passes
+                await createUser(formData);
+                
+                //Set the user in state
+                const newUser : User | null = await getUser();
+                if(newUser) {
+                    setUser(newUser );
                     router.push("/");
                 }
             } catch (error) {

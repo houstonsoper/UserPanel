@@ -2,29 +2,19 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import User from "@/interfaces/user";
-import {getUser, userLogout} from "@/services/userService";
+import { getUser, userLogout } from "@/services/userService";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/contexts/userContext";
 
 export default function HomePage() {
-    const [user, setUser] = useState(null);
+    const { user, logout, loading }  = useUser();
     const router = useRouter();
     
-    //Fetch the details of the user if they are logged in
-    useEffect(() => {
-        const fetchUser = async () => {
-            const user = await getUser();
-            
-            if(!user) {
-                router.push("/login");
-            }
-            setUser(user);
-        }
-        fetchUser();
-    }, []);
-    
+    //Handler to logout user when the logout button is pressed.
     const handleLogout = async () => {
-        await userLogout();
+        await logout();
+        
+        if(!loading)
         router.push("/login");
     }
     
@@ -32,7 +22,7 @@ export default function HomePage() {
         <div className="container m-auto">
             <div className="flex h-screen">
                 <div className="m-auto flex flex-col w-3/4 max-w-96 gap-2">
-                    {!user ? (
+                    {!user && !loading ? (
                         <div>
                             <Link href="/login">
                                 <button className="bg-blue-300 text-white font-semibold p-2 w-full">

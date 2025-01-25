@@ -78,7 +78,7 @@ export function validateLoginForm(formData: FormData): Error[] | null {
     return null
 }
 
-export async function createUser(formData: FormData): Promise<User | null> {
+export async function createUser(formData: FormData) {
     const registrationDetails: RegistrationDetails = extractFormDate(formData);
 
     const url: string = BASEURL + "/Register"
@@ -95,10 +95,9 @@ export async function createUser(formData: FormData): Promise<User | null> {
         console.error(errorData.message);
         throw new Error(errorData.message);
     }
-    return response.json();
 }
 
-export async function userLogin(formData: FormData): Promise<User | null> {
+export async function userLogin(formData: FormData) {
     const loginDetails: LoginDetails = extractFormDate(formData);
 
     const url: string = BASEURL + "/Login"
@@ -115,10 +114,9 @@ export async function userLogin(formData: FormData): Promise<User | null> {
         console.error(errorData.message);
         throw new Error(errorData.message);
     }
-    return response.json();
 }
 
-export async function getUser() {
+export async function getUser() : Promise<User | null> {
     const response: Response = await fetch(BASEURL, {
         method: "GET",
         credentials: "include",
@@ -132,7 +130,7 @@ export async function getUser() {
     return response.json();
 }
 
-export async function userLogout() {
+export async function userLogout()  {
     const url: string = BASEURL + "/Logout"
     const response: Response = await fetch(url, {
         method: "POST",
@@ -142,5 +140,4 @@ export async function userLogout() {
     if (!response.ok) {
         throw new Error("Unable to logout");
     }
-    return response.json();
 } 
