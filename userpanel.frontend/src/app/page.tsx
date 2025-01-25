@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import User from "@/interfaces/user";
-import {getUser, logout} from "@/services/userService";
+import {getUser, userLogout} from "@/services/userService";
 import { useRouter } from "next/navigation";
 
 export default function HomePage() {
@@ -24,7 +24,7 @@ export default function HomePage() {
     }, []);
     
     const handleLogout = async () => {
-        await logout();
+        await userLogout();
         router.push("/login");
     }
     
