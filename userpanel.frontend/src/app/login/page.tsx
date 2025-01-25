@@ -2,13 +2,15 @@
 
 import {RefObject, useRef, useState} from "react";
 import Link from "next/link";
-import {login, validateLoginForm, validateRegistrationForm} from "@/services/userService";
+import {userLogin, validateLoginForm } from "@/services/userService";
 import User from "@/interfaces/user";
+import {useRouter} from "next/navigation";
 
 export default function LoginPage() {
     const formRef : RefObject<HTMLFormElement | null>= useRef<HTMLFormElement>(null);
     const [areDetailsInvalid, setAreDetailsInvalid] = useState<boolean>(false);
     const [errors, setErrors] = useState<Error[]>([]);
+    const router  = useRouter();
    
     const handleFormSubmit = async (e : React.FormEvent) => {
         e.preventDefault();
@@ -27,8 +29,10 @@ export default function LoginPage() {
             
             //Attempt to log the user in 
             try{
-                const user : User | null = await login(formData);
-                console.log(user);
+                const user : User | null = await userLogin(formData);
+                if (user) {
+                    router.push("/");
+                }
             } catch (error){
                 if (error instanceof Error) {
                     setErrors([{name: "UserLoginError", message: error.message}]);

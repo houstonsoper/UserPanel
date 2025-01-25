@@ -31,8 +31,14 @@ public class UserController : Controller
         try
         {
             var user = await _userService.CreateUserAsync(userDto);
-            if (user != null) 
-                return Ok(new { message = "User created successfully"});
+            
+            if (user != null)
+            { 
+                //Store session info
+                HttpContext.Session.SetString("UserId", user.UserId.ToString()); 
+                
+                return Ok(new { message = "User created successfully" });
+            }
         }
         catch (Exception ex)
         {

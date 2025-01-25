@@ -87,6 +87,7 @@ export async function createUser(formData: FormData): Promise<User | null> {
         method: "POST",
         body: JSON.stringify(registrationDetails),
         headers: {"Content-Type": "application/json"},
+        credentials: "include",
     });
 
     if (!response.ok) {
@@ -97,7 +98,7 @@ export async function createUser(formData: FormData): Promise<User | null> {
     return response.json();
 }
 
-export async function login(formData: FormData): Promise<User | null> {
+export async function userLogin(formData: FormData): Promise<User | null> {
     const loginDetails: LoginDetails = extractFormDate(formData);
 
     const url: string = BASEURL + "/Login"
@@ -131,7 +132,7 @@ export async function getUser() {
     return response.json();
 }
 
-export async function logout() {
+export async function userLogout() {
     const url: string = BASEURL + "/Logout"
     const response: Response = await fetch(url, {
         method: "POST",
