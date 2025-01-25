@@ -19,7 +19,7 @@ public class UserController : Controller
         _userService = userService;
     }
     
-    [HttpPost ("/Register")]
+    [HttpPost ("Register")]
     public async Task<IActionResult> Register([FromBody] UserRegistrationDto userDto)
     {
         if (!ModelState.IsValid)
@@ -41,7 +41,7 @@ public class UserController : Controller
         return BadRequest(new { message = "Unable to create user" });
     }
 
-    [HttpPost ("/Login")]
+    [HttpPost ("Login")]
     public async Task<IActionResult> Login([FromBody] UserLoginDto userLoginDto)
     {
         if (!ModelState.IsValid)
@@ -69,8 +69,8 @@ public class UserController : Controller
             return Unauthorized(new { message = ex.Message });
         }
     }
-    [HttpGet ("/Session")]
-    public async Task<IActionResult> GetCurrentUserSession()
+    [HttpGet]
+    public async Task<IActionResult> GetUser()
     {
         var userId = HttpContext.Session.GetString("UserId");
 
@@ -90,7 +90,7 @@ public class UserController : Controller
         }
     }
 
-    [HttpPost("/Logout")]
+    [HttpPost("Logout")]
     public IActionResult Logout()
     {
         HttpContext.Session.Remove("UserId");

@@ -2,6 +2,8 @@
 import User from "@/interfaces/user";
 import LoginDetails from "@/interfaces/loginDetails";
 
+const BASEURL: string = "https://localhost:44378/User"
+
 export function extractFormDate(form: FormData): RegistrationDetails {
     const forename: string | undefined = form.get('forename')?.toString();
     const surname: string | undefined = form.get('surname')?.toString();
@@ -40,14 +42,12 @@ export function validateRegistrationForm(formData: FormData): Error[] | null {
     //and that the password is between 5 and 15 characters
     if (!details.password && !details.confirmPassword) {
         errors.push({name: "InvalidPassword", message: "Please enter a password"});
+    } else if (details.password !== details.confirmPassword) {
+        errors.push({name: "PasswordMismatch", message: "Passwords do not match"});
+    } else if (details.password.length < 5 || details.password.length > 15) {
+        errors.push({name: "InvalidPasswordLength", message: "Password must be between 5 and 15 characters"});
     }
-        else if (details.password !== details.confirmPassword) {
-            errors.push({name: "PasswordMismatch", message: "Passwords do not match"});
-        }
-        else if (details.password.length < 5 || details.password.length > 15) {
-            errors.push({name: "InvalidPasswordLength", message: "Password must be between 5 and 15 characters"});
-        }
-    
+
     //Return any errors 
     if (errors.length > 0) {
         return errors;
@@ -81,51 +81,65 @@ export function validateLoginForm(formData: FormData): Error[] | null {
 export async function createUser(formData: FormData): Promise<User | null> {
     const registrationDetails: RegistrationDetails = extractFormDate(formData);
 
-    try {
-        const url: string = "https://localhost:44378/Register"
+    const url: string = BASEURL + "/Register"
 
-        const response: Response = await fetch(url, {
-            method: "POST",
-            body: JSON.stringify(registrationDetails),
-            headers: {"Content-Type": "application/json"},
-        });
+    const response: Response = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(registrationDetails),
+        headers: {"Content-Type": "application/json"},
+    });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message);
-        }
-        return response.json();
-    } catch (error) {
-        if (error instanceof Error) {
-            console.error(error);
-            throw new Error(error.message);
-        }
-        return null;
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error(errorData.message);
+        throw new Error(errorData.message);
     }
+    return response.json();
 }
 
 export async function login(formData: FormData): Promise<User | null> {
     const loginDetails: LoginDetails = extractFormDate(formData);
 
-    try {
-        const url: string = "https://localhost:44378/Login"
+    const url: string = BASEURL + "/Login"
 
-        const response: Response = await fetch(url, {
-            method: "POST",
-            body: JSON.stringify(loginDetails),
-            headers: {"Content-Type": "application/json"},
-        });
+    const response: Response = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(loginDetails),
+        headers: {"Content-Type": "application/json"},
+        credentials: "include",
+    });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message);
-        }
-        return response.json();
-    } catch (error) {
-        if (error instanceof Error) {
-            console.error(error);
-            throw new Error(error.message);
-        }
-        return null;
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error(errorData.message);
+        throw new Error(errorData.message);
     }
+    return response.json();
 }
+
+export async function getUser() {
+    const response: Response = await fetch(BASEURL, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error(errorData);
+        throw new Error(errorData.message);
+    }
+    return response.json();
+}
+
+export async function logout() {
+    const url: string = BASEURL + "/Logout"
+    const response: Response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        throw new Error("Unable to logout");
+    }
+    return response.json();
+} 

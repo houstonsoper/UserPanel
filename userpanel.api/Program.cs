@@ -27,7 +27,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:3000") //front-end URL
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyOrigin();
+            .AllowCredentials();
     });
 });
 
@@ -40,6 +40,7 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromDays(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = SameSiteMode.None; 
 });
 
 builder.Services.AddAuthentication();
