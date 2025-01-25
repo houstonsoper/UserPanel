@@ -58,23 +58,23 @@ export default function Home() {
                     </div>
                     <div className="py-1">
                         <label htmlFor="forename">First name</label>
-                        <input className="w-full bg-gray-100" type="text" name="forename" required/>
+                        <input className="w-full bg-gray-100" type="text" name="forename"/>
                     </div>
                     <div className="py-1">
                         <label htmlFor="surname">Surname</label>
-                        <input className="w-full bg-gray-100" type="text" name="surname" required/>
+                        <input className="w-full bg-gray-100" type="text" name="surname"/>
                     </div>
                     <div className="py-1">
                         <label htmlFor="email">Email</label>
-                        <input className="w-full bg-gray-100" type="email" name="email" required/>
+                        <input className="w-full bg-gray-100" type="email" name="email"/>
                     </div>
                     <div className="py-1">
                         <label htmlFor="password">Password</label>
-                        <input className="w-full bg-gray-100" type="password" name="password" required/>
+                        <input className="w-full bg-gray-100" type="password" name="password"/>
                     </div>
                     <div className="py-1">
                         <label htmlFor="confirmPassword">Confirm password</label>
-                        <input className="w-full bg-gray-100" type="password" name="confirmPassword" required/>
+                        <input className="w-full bg-gray-100" type="password" name="confirmPassword"/>
                     </div>
                     <div className="flex justify-center pt-4">
                         <button type="submit" className="bg-blue-500 text-white font-semibold p-2 w-full">
@@ -86,7 +86,7 @@ export default function Home() {
                     </div>
                     <div className="flex justify-center">
                         <Link href="/login" className="w-full">
-                            <button className="bg-blue-300 text-white font-semibold p-2 w-full">
+                            <button className="bg-gray-700 text-white font-semibold p-2 w-full">
                                 Login
                             </button>
                         </Link>

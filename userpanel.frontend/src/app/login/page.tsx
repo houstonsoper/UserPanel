@@ -75,7 +75,7 @@ export default function LoginPage() {
                         </div>
                         <div className="flex justify-center">
                             <Link href="/register" className="w-full">
-                                <button className="bg-blue-300 text-white font-semibold p-2 w-full">
+                                <button className="bg-gray-700 text-white font-semibold p-2 w-full">
                                     Register
                                 </button>
                             </Link>
