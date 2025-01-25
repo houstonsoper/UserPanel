@@ -53,13 +53,47 @@ public class UserController : Controller
         try
         {
             var user = await _userService.LoginAsync(userLoginDto);
-            if (user != null) 
-                return Ok(new { message = "Logged in successfully" });
+            
+            if (user == null)
+            {
+                return BadRequest(new { message = "Unable to login" });
+            } 
+            
+            //Store session info
+            HttpContext.Session.SetString("UserId", user.UserId.ToString()); 
+            
+            return Ok(new { message = "Login successful" });
         }
         catch (Exception ex)
         {
             return Unauthorized(new { message = ex.Message });
         }
-        return BadRequest(new { message = "Unable to login" });
+    }
+    [HttpGet ("/Session")]
+    public async Task<IActionResult> GetCurrentUserSession()
+    {
+        var userId = HttpContext.Session.GetString("UserId");
+
+        if (userId == null)
+        {
+            return Unauthorized(new {message = "User is not logged in"});
+        }
+        
+        try
+        {
+            var user = await _userService.GetUserByIdAsync(userId); 
+            return Ok(new {email = user.Email});
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("/Logout")]
+    public IActionResult Logout()
+    {
+        HttpContext.Session.Remove("UserId");
+        return Ok(new { message = "Logout successful" });
     }
 }

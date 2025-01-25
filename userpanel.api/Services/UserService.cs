@@ -58,4 +58,16 @@ public class UserService
 
         return user;
     }
+
+    public async Task<User?> GetUserByIdAsync(string userId)
+    {
+        var user = await _userRepository.GetUserByIdAsync(userId);
+
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+        
+        return user;
+    }
 }
