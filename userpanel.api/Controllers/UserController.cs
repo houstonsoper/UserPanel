@@ -82,17 +82,16 @@ public class UserController : Controller
     {
         //Get userID from the session
         var userId = HttpContext.Session.GetString("UserId");
-
-        if (userId == null)
-        {
-            return Ok(new {message = "User is not logged in"});
-        }
         
-        //Attempt to get the user details of the user 
+        //Attempt to get the details of the user 
         try
         {
+            if (userId == null)
+            {
+                return Ok(new { message = "User is not logged in" });
+            }
             var user = await _userService.GetUserByIdAsync(Guid.Parse(userId)); 
-            return Ok(user.ToUserRequestDto());
+            return Ok(user?.ToUserRequestDto());
         }
         catch (Exception ex)
         {

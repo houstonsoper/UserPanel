@@ -159,17 +159,15 @@ export async function getUser() : Promise<User | null> {
         credentials: "include",
     });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        
-        //Return null user if user is not logged in
-        if (errorData.message === "User is not logged in") {
+    if (response.ok) {
+        var responseData = await response.json();
+
+        if(responseData.message === "User is not logged in"){
             return null;
         }
-        console.error(errorData);
-        throw new Error(errorData.message);
+        return responseData;
     }
-    return await response.json();
+    return null;
 }
 
 export async function userLogout()  {

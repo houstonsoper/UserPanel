@@ -29,6 +29,7 @@ public class PasswordResetTokenController : Controller
             return BadRequest(ModelState);
         }
         
+        //Attempt to create the PasswordResetToken
         try
         { 
             var token = await _passwordTokenService.CreatePasswordResetTokenAsync(resetTokenDto.Email);
@@ -48,6 +49,7 @@ public class PasswordResetTokenController : Controller
     [HttpGet ("{tokenId}")]
     public async Task<IActionResult> PasswordResetToken([FromRoute] string tokenId)
     {
+        //Attempt to retrieve the PasswordTokenDetails
         try
         { 
             var token = await _passwordTokenService.GetTokenByTokenIdAsync(new Guid(tokenId));
