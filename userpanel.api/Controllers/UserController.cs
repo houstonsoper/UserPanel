@@ -12,9 +12,9 @@ namespace userpanel.api.Controllers;
 [Route("[controller]")]
 public class UserController : Controller
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
-    public UserController(IUserRepository userRepository, UserService userService)
+    public UserController(IUserService userService)
     {
         _userService = userService;
     }
@@ -42,7 +42,7 @@ public class UserController : Controller
         }
         catch (Exception ex)
         {
-            return BadRequest(new {message = ex.Message});
+            return BadRequest(new { message = ex.Message});
         }
         return BadRequest(new { message = "Unable to create user" });
     }

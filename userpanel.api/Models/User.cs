@@ -23,4 +23,11 @@ public class User
     [StringLength(15, ErrorMessage = "Password must be between 5 and 15 characters", MinimumLength = 5)]
     [NotMapped] 
     public required string Password { get; set; }
+    
+    public int UserGroupId { get; set; } = 1;
+
+    public DateTime CreateDateTime { get; set; } = DateTime.UtcNow;
+    
+    //Navigation
+    public UserGroup UserGroup { get; set; }
 }

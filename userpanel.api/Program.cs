@@ -9,15 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 builder.Services.AddDbContext<UserPanelDbContext>(options =>
 {
     options.UseSqlServer(
         builder.Configuration["ConnectionStrings:UserPanelDbContextConnection"]);
 });
 
+builder.Services.AddTransient<IEmailSender,EmailSender>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Enable CORS
 builder.Services.AddCors(options =>

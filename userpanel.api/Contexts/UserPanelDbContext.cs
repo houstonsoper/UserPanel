@@ -17,6 +17,7 @@ public class UserPanelDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new UserEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new UserGroupEntityTypeConfiguration());
     }
 
     public UserPanelDbContext(DbContextOptions<UserPanelDbContext> options) : base(options)

@@ -6,13 +6,15 @@ using userpanel.api.Repositories;
 
 namespace userpanel.api.Services;
 
-public class UserService
+public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IEmailSender _emailSender;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, IEmailSender emailSender)
     {
         _userRepository = userRepository;
+        _emailSender = emailSender;
     }
 
     public async Task<User?> CreateUserAsync(UserRegistrationDto userDto)
@@ -36,7 +38,16 @@ public class UserService
             Password = hashedPassword,
         };
         
-        return await _userRepository.CreateUserAsync(user);
+        var newUser =  await _userRepository.CreateUserAsync(user);
+
+        if (newUser == null)
+        {
+            throw new Exception("Failed to create user");
+        }
+        
+        //Send email to user that they have been registered
+        _emailSender.SendEmail(userDto.Email, "User created");
+        return newUser;
     }
 
     public async Task<User?> LoginAsync(UserLoginDto userDto)

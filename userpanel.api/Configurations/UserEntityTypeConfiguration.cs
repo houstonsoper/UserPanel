@@ -11,5 +11,10 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Password)
             .IsRequired()
             .HasMaxLength(200);
+        
+        builder
+            .HasOne(u => u.UserGroup)
+            .WithMany()
+            .HasForeignKey(u => u.UserGroupId);
     }
 }

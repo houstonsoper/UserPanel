@@ -12,7 +12,7 @@ public static class UserExtension
             Forename = user.Forename,
             Surname = user.Surname,
             Email = user.Email,
-            Password = user.Password
+            Password = user.Password,
         };
     }
 

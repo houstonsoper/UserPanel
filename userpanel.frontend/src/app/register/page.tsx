@@ -42,7 +42,7 @@ export default function Home() {
                 }
             } catch (error) {
                 if (error instanceof Error) {
-                    setErrors([{name: "UserCreationError", message: error.message}]);
+                    setErrors([{name: "UserRegistrationError", message: error.message}]);
                     setAreDetailsInvalid(true);
                 }
             }
