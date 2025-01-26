@@ -161,6 +161,11 @@ export async function getUser() : Promise<User | null> {
 
     if (!response.ok) {
         const errorData = await response.json();
+        
+        //Return null user if user is not logged in
+        if (errorData.message === "User is not logged in") {
+            return null;
+        }
         console.error(errorData);
         throw new Error(errorData.message);
     }

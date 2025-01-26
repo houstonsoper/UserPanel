@@ -40,9 +40,9 @@ export default function LoginPage() {
                     router.push("/");
                 }
             } catch (error){
-                if (error instanceof Error && error.name === "Unauthorized") {
+                if (error instanceof Error) {
                     setErrors([{name: "UserLoginError", message: error.message}]);
-                    setAreDetailsInvalid(true)
+                    console.log("erorrswowoow", error);
                 }
             }
         }

@@ -80,13 +80,15 @@ public class UserController : Controller
     [HttpGet]
     public async Task<IActionResult> GetUser()
     {
+        //Get userID from the session
         var userId = HttpContext.Session.GetString("UserId");
 
         if (userId == null)
         {
-            return Unauthorized(new {message = "User is not logged in"});
+            return Ok(new {message = "User is not logged in"});
         }
         
+        //Attempt to get the user details of the user 
         try
         {
             var user = await _userService.GetUserByIdAsync(Guid.Parse(userId)); 
@@ -110,8 +112,10 @@ public class UserController : Controller
     {
         try
         {
+            //Get the details of the password token
             var token = await _passwordTokenService.GetTokenByTokenIdAsync(userPasswordResetDto.TokenId);
 
+            //If password token is valid/exists then reset the users password
             if (token != null)
             {
                 await _userService.ResetPasswordAsync(token.UserId, token.TokenId, userPasswordResetDto.Password);

@@ -10,31 +10,33 @@ export default function ResetPasswordPage() {
     const formRef = useRef<HTMLFormElement | null>(null);
     const [errors, setErrors] = useState<Error[] | null>(null);
     const searchParams = useSearchParams();
-    const [isValidToken, setIsValidToken] = useState<boolean>(true);
+    const [isValidToken, setIsValidToken] = useState<boolean>(false);
     const [passwordResetToken, setPasswordResetToken] = useState<PasswordResetToken | null>(null);
     const [passwordReset, setPasswordReset] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const getPasswordResetToken = async () => {
-
+            
             //Get password reset token from search params
             const tokenId: string | null = searchParams.get("token"); //Get password reset token
 
             //Check if search params contain a valid token
             if (!tokenId) {
-                setIsValidToken(false);
+                setLoading(false);
                 return;
             }
-
+            
             //Fetch token, as well as check if it has not expired/is valid
             const token: PasswordResetToken = await fetchPasswordToken(tokenId);
             if (!token) {
-                setIsValidToken(false);
+                setLoading(false);
                 return;
             }
+            
             setIsValidToken(true);
-            console.log(token);
             setPasswordResetToken(token);
+            setLoading(false);
         }
         getPasswordResetToken();
     }, [searchParams]);
@@ -66,6 +68,9 @@ export default function ResetPasswordPage() {
             }
         }
     }
+    
+    //Don't return form if page is loading
+    if(loading) return null;
 
     return (
         <div className="container m-auto">
@@ -79,7 +84,7 @@ export default function ResetPasswordPage() {
                     >
                         <div className="pb-3">
                             <h1 className="text-2xl ">Reset password</h1>
-                            <p className="text-gray-600">Please enter your email to reset your password</p>
+                            <p className="text-gray-600">Please enter your new password</p>
                         </div>
                         <div>
                             {errors ? (
