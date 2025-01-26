@@ -10,7 +10,6 @@ public static class PasswordResetTokenExtension
       return new PasswordResetTokenRequestDto
       {
          TokenId = token.TokenId,
-         UserId = token.UserId,
          CreatedAt = token.CreatedAt,
          ExpiresAt = token.ExpiresAt,
          TokenUsed = token.TokenUsed

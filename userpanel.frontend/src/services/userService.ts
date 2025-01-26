@@ -91,7 +91,28 @@ export function validateForgotPasswordForm (formData: FormData): Error[] | null 
         return errors;
     }
 
-    return null
+    return null;
+}
+
+export function validatePasswordResetForm (formData: FormData): Error[] | null {
+    const details: UserFormDetails = extractFormDate(formData);
+    let errors: Error[] = [];
+
+    //Check that passwords match 
+    //and that the password is between 5 and 15 characters
+    if (!details.password && !details.confirmPassword) {
+        errors.push({name: "InvalidPassword", message: "Please enter a password"});
+    } else if (details.password !== details.confirmPassword) {
+        errors.push({name: "PasswordMismatch", message: "Passwords do not match"});
+    } else if (details.password.length < 5 || details.password.length > 15) {
+        errors.push({name: "InvalidPasswordLength", message: "Password must be between 5 and 15 characters"});
+    }
+    
+    //Return any errors
+    if (errors.length > 0) {
+        return errors;
+    }
+    return null;
 }
 
 export async function createUser(formData: FormData) {
@@ -143,7 +164,7 @@ export async function getUser() : Promise<User | null> {
         console.error(errorData);
         throw new Error(errorData.message);
     }
-    return response.json();
+    return await response.json();
 }
 
 export async function userLogout()  {
@@ -168,4 +189,36 @@ export async function sendPasswordResetToken(formData: FormData) {
         body: JSON.stringify({email : details.email}),
         headers: {"Content-Type": "application/json"},
     });
+}
+
+export async function fetchPasswordToken(tokenId : string ) {
+    const url: string = "https://localhost:44378/PasswordResetToken/" + tokenId;
+    const response : Response = await fetch(url);
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error(errorData.message);
+        return null;
+    }
+    
+    return await response.json();
+}
+
+export async function userResetPassword(tokenId : string, formData : FormData ) {
+    const details: UserFormDetails = extractFormDate(formData);
+    
+    const url: string = BASEURL + "/ResetPassword";
+    const response : Response = await fetch(url, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({tokenId : tokenId, password: details.password}),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error(errorData.message);
+        throw new Error(errorData.message);
+    }
+    
+    return await response.json();
 }

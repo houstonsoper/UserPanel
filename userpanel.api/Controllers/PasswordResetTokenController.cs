@@ -44,4 +44,23 @@ public class PasswordResetTokenController : Controller
         }
         return BadRequest(new { message = "Unable to create tokenPost" });
     }
+    
+    [HttpGet ("{tokenId}")]
+    public async Task<IActionResult> PasswordResetToken([FromRoute] string tokenId)
+    {
+        try
+        { 
+            var token = await _passwordTokenService.GetTokenByTokenIdAsync(new Guid(tokenId));
+
+            if (token != null)
+            {
+                return Ok(token.ToPasswordResetTokenRequestDto());
+            }
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        return BadRequest(new { message = "Unable to create tokenPost" });
+    }
 }
