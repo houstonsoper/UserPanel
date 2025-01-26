@@ -6,13 +6,21 @@ namespace userpanel.api.Services;
 
 public class EmailSender : IEmailSender
 {
-    public void SendEmail(string toEmail, string subject)
+    public SmtpClient SetupSmtpClient()
     {
-        // Set up SMTP client
-        var client = new SmtpClient("smtp.gmail.com", 587);
-        client.EnableSsl = true;
-        client.UseDefaultCredentials = false;
-        client.Credentials = new NetworkCredential("houstonsoperdummyemail@gmail.com", "odsp rihz pgju rdpb");
+        var client = new SmtpClient("smtp.gmail.com", 587)
+        {
+            EnableSsl = true,
+            UseDefaultCredentials = false,
+            Credentials = new NetworkCredential("houstonsoperdummyemail@gmail.com", "odsp rihz pgju rdpb")
+        };
+
+        return client;
+    }
+    public void SendRegistrationEmail(string toEmail, string subject)
+    {
+        var client = SetupSmtpClient();
+        
         // Create email message
         var mailMessage = new MailMessage();
         mailMessage.From = new MailAddress("houstonsoperdummyemail@gmail.com");

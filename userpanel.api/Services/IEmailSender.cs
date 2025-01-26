@@ -1,6 +1,9 @@
-﻿namespace userpanel.api.Services;
+﻿using System.Net.Mail;
+
+namespace userpanel.api.Services;
 
 public interface IEmailSender
 {
-    void SendEmail(string toEmail, string subject);
+    void SendRegistrationEmail(string toEmail, string subject);
+    SmtpClient SetupSmtpClient();
 }
