@@ -47,7 +47,8 @@ export default function HomePage() {
     }
     return (
         <div className="container m-auto">
-            <div className="flex justify-center h-screen">
+            <div className="flex h-screen">
+                <div className="m-auto 2xl:w-1/4 max-w-96">
                 <form
                     className="border border-gray-300 p-6 rounded-2xl m-auto"
                     onSubmit={handleFormSubmit}
@@ -100,6 +101,7 @@ export default function HomePage() {
                         </Link>
                     </div>
                 </form>
+                </div>
             </div>
         </div>
     );

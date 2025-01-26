@@ -147,7 +147,7 @@ export async function getUser() : Promise<User | null> {
 }
 
 export async function userLogout()  {
-    const url: string = BASEURL + "/Logout"
+    const url: string = BASEURL + "/Logout";
     const response: Response = await fetch(url, {
         method: "POST",
         credentials: "include",
@@ -157,3 +157,15 @@ export async function userLogout()  {
         throw new Error("Unable to logout");
     }
 } 
+
+export async function sendPasswordResetToken(formData: FormData) {
+    const details : UserFormDetails = extractFormDate(formData);
+    
+    const url: string = "https://localhost:44378/PasswordResetToken";
+ 
+    await fetch(url, {
+        method: "POST",
+        body: JSON.stringify({email : details.email}),
+        headers: {"Content-Type": "application/json"},
+    });
+}
