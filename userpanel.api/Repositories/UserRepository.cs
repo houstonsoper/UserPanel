@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using userpanel.api.Contexts;
+using userpanel.api.Dtos;
 using userpanel.api.Models;
 
 namespace userpanel.api.Repositories;
@@ -26,9 +27,31 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<User?> GetUserByIdAsync(string userId)
+    public async Task<User?> GetUserByIdAsync(Guid userId)
     {
         return await _context.Users
-            .FirstOrDefaultAsync(u => u.UserId.ToString() == userId);
+            .FirstOrDefaultAsync(u => u.UserId == userId);
+    }
+
+    public async Task<PasswordResetToken?> CreatePasswordResetTokenAsync(PasswordResetToken passwordResetToken)
+    {
+        await _context.PasswordResetTokens.AddAsync(passwordResetToken);
+        await _context.SaveChangesAsync();
+        return passwordResetToken;
+    }
+
+    public async Task<PasswordResetToken?> GetPasswordResetTokenAsync(Guid userId)
+    {
+        return await _context.PasswordResetTokens
+            .FirstOrDefaultAsync(u => u.UserId == userId && u.IsActive); 
+    }
+
+    public async Task<bool> ResetPasswordAsync(User user, string hashedPassword)
+    {
+        //Update password and save changes to DB
+        user.Password = hashedPassword;
+        await _context.SaveChangesAsync();
+        
+        return true;
     }
 }

@@ -70,7 +70,7 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<User?> GetUserByIdAsync(string userId)
+    public async Task<User?> GetUserByIdAsync(Guid userId)
     {
         var user = await _userRepository.GetUserByIdAsync(userId);
 
@@ -80,5 +80,46 @@ public class UserService : IUserService
         }
         
         return user;
+    }
+
+    public async Task<PasswordResetToken?> CreatePasswordResetTokenAsync(PasswordResetToken token)
+    {
+        //Check if there is already an active token for the user
+        var existingToken = await _userRepository.GetPasswordResetTokenAsync(token.UserId);
+
+        //If no existing token create a new one
+        if (existingToken == null)
+        { 
+            return await _userRepository.CreatePasswordResetTokenAsync(token);
+        }
+        
+        return existingToken;
+    }
+
+    public async Task ResetPasswordAsync(Guid userId, string newPassword)
+    {
+        //Get user
+        var user = await _userRepository.GetUserByIdAsync(userId);
+
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+
+        if (user.Password.Length < 5 || user.Password.Length > 15)
+        {
+            throw new Exception ("Invalid password");
+        }
+        
+        //Hash password
+        var passwordHasher = new PasswordHasher<User>();
+        var hashedPassword = passwordHasher.HashPassword(user, newPassword);
+        
+        var resetPassword = await _userRepository.ResetPasswordAsync(user, hashedPassword);
+
+        if (!resetPassword)
+        {
+            throw new Exception("Failed to reset password");
+        }
     }
 }
