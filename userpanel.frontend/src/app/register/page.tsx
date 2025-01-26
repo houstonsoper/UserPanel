@@ -8,16 +8,15 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {useUser} from "@/contexts/userContext";
 
-export default function Home() {
+export default function HomePage() {
     const formRef: RefObject<HTMLFormElement | null> = useRef<HTMLFormElement>(null);
-    const [areDetailsInvalid, setAreDetailsInvalid] = useState<boolean>(false);
-    const [errors, setErrors] = useState<Error[]>([]);
+    const [errors, setErrors] = useState<Error[] | null>(null);
     const router = useRouter();
     const { setUser } = useUser();
     
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setAreDetailsInvalid(false); //Clear current errors 
+        setErrors(null); //Clear current errors 
 
         if (formRef.current) {
             const formData = new FormData(formRef.current);
@@ -26,7 +25,6 @@ export default function Home() {
             const formErrors: Error[] | null = validateRegistrationForm(formData);
             if (formErrors) {
                 setErrors(formErrors);
-                setAreDetailsInvalid(true);
                 return;
             }
             
@@ -43,7 +41,6 @@ export default function Home() {
             } catch (error) {
                 if (error instanceof Error) {
                     setErrors([{name: "UserRegistrationError", message: error.message}]);
-                    setAreDetailsInvalid(true);
                 }
             }
         }
@@ -61,7 +58,7 @@ export default function Home() {
                         <p className="text-gray-600">Please enter your details</p>
                     </div>
                     <div>
-                        {areDetailsInvalid ? (
+                        {errors ? (
                             errors.map(e => (
                                 <p className="text-red-500" key={e.name}> {e.message}</p>
                             ))

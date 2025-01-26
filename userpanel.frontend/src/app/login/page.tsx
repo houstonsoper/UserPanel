@@ -10,7 +10,7 @@ import {useUser} from "@/contexts/userContext";
 export default function LoginPage() {
     const formRef : RefObject<HTMLFormElement | null>= useRef<HTMLFormElement>(null);
     const [areDetailsInvalid, setAreDetailsInvalid] = useState<boolean>(false);
-    const [errors, setErrors] = useState<Error[]>([]);
+    const [errors, setErrors] = useState<Error[] | null>(null);
     const router  = useRouter();
     const { user, setUser } = useUser();
 
@@ -18,7 +18,7 @@ export default function LoginPage() {
     
     const handleFormSubmit = async (e : React.FormEvent) => {
         e.preventDefault();
-        setAreDetailsInvalid(false); //Clear current errors 
+        setErrors(null); //Clear current errors 
 
         if (formRef.current) {
             const formData = new FormData(formRef.current);
@@ -27,7 +27,6 @@ export default function LoginPage() {
             const formErrors: Error[] | null = validateLoginForm(formData);
             if (formErrors) {
                 setErrors(formErrors);
-                setAreDetailsInvalid(true);
                 return;
             }
 
@@ -62,7 +61,7 @@ export default function LoginPage() {
                             <p className="text-gray-600">Please enter your details</p>
                         </div>
                         <div>
-                            {areDetailsInvalid ? (
+                            {errors ? (
                                 errors.map(e => (
                                     <p className="text-red-500" key={e.name}> {e.message}</p>
                                 ))
@@ -75,6 +74,11 @@ export default function LoginPage() {
                         <div className="py-1">
                             <label htmlFor="password">Password</label>
                             <input className="w-full bg-gray-100" type="password" name="password"/>
+                        </div>
+                        <div>
+                            <Link href="/forgotpassword">
+                            <p className="text-blue-500">Forgot password?</p>
+                            </Link>
                         </div>
                         <div className="flex justify-center pt-4">
                             <button type="submit" className="bg-blue-500 text-white font-semibold p-2 w-full">

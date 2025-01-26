@@ -1,4 +1,4 @@
-﻿export default interface RegistrationDetails {
+﻿export default interface UserFormDetails {
     forename : string,
     surname : string,
     email : string,

@@ -1,21 +1,20 @@
-﻿import RegistrationDetails from "@/interfaces/registrationDetails";
-import User from "@/interfaces/user";
-import LoginDetails from "@/interfaces/loginDetails";
+﻿import User from "@/interfaces/user";
+import UserFormDetails from "@/interfaces/userFormDetails";
 
 const BASEURL: string = "https://localhost:44378/User"
 
-export function extractFormDate(form: FormData): RegistrationDetails {
+export function extractFormDate(form: FormData): UserFormDetails{
     const forename: string | undefined = form.get('forename')?.toString();
     const surname: string | undefined = form.get('surname')?.toString();
     const email: string | undefined = form.get('email')?.toString();
     const password: string | undefined = form.get('password')?.toString();
     const confirmPassword: string | undefined = form.get('confirmPassword')?.toString();
 
-    return {forename, surname, email, password, confirmPassword} as RegistrationDetails
+    return {forename, surname, email, password, confirmPassword} as UserFormDetails;
 }
 
 export function validateRegistrationForm(formData: FormData): Error[] | null {
-    const details: RegistrationDetails = extractFormDate(formData);
+    const details: UserFormDetails = extractFormDate(formData);
     let errors: Error[] = [];
 
     //Check if forename is supplied and is between 1 and 20 characters
@@ -57,7 +56,7 @@ export function validateRegistrationForm(formData: FormData): Error[] | null {
 }
 
 export function validateLoginForm(formData: FormData): Error[] | null {
-    const details: RegistrationDetails = extractFormDate(formData);
+    const details: UserFormDetails = extractFormDate(formData);
     let errors: Error[] = [];
 
     //Check if an email has been entered
@@ -78,8 +77,25 @@ export function validateLoginForm(formData: FormData): Error[] | null {
     return null
 }
 
+export function validateForgotPasswordForm (formData: FormData): Error[] | null {
+    const details: UserFormDetails = extractFormDate(formData);
+    let errors: Error[] = [];
+
+    //Check if an email has been entered
+    if (!details.email) {
+        errors.push({name: "InvalidEmail", message: "Please enter your email"});
+    }
+
+    //Return any errors 
+    if (errors.length > 0) {
+        return errors;
+    }
+
+    return null
+}
+
 export async function createUser(formData: FormData) {
-    const registrationDetails: RegistrationDetails = extractFormDate(formData);
+    const registrationDetails: UserFormDetails = extractFormDate(formData);
 
     const url: string = BASEURL + "/Register"
 
@@ -98,7 +114,7 @@ export async function createUser(formData: FormData) {
 }
 
 export async function userLogin(formData: FormData) {
-    const loginDetails: LoginDetails = extractFormDate(formData);
+    const loginDetails: UserFormDetails = extractFormDate(formData);
 
     const url: string = BASEURL + "/Login"
 
