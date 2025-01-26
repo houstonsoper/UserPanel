@@ -19,7 +19,7 @@ builder.Services.AddTransient<IEmailSender,EmailSender>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordTokenService, PasswordTokenService>();
-builder.Services.AddScoped<IPasswordRepository, PasswordRepository>();
+builder.Services.AddScoped<IPasswordTokenRepository, PasswordTokenRepository>();
 
 // Enable CORS
 builder.Services.AddCors(options =>

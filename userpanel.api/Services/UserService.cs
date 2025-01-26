@@ -10,11 +10,13 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IEmailSender _emailSender;
+    private readonly IPasswordTokenRepository _passwordTokenRepository;
 
-    public UserService(IUserRepository userRepository, IEmailSender emailSender)
+    public UserService(IUserRepository userRepository, IEmailSender emailSender, IPasswordTokenRepository passwordTokenRepository)
     {
         _userRepository = userRepository;
         _emailSender = emailSender;
+        _passwordTokenRepository = passwordTokenRepository;
     }
 
     public async Task<User?> CreateUserAsync(UserRegistrationDto userDto)
@@ -81,8 +83,20 @@ public class UserService : IUserService
         
         return user;
     }
+    
+    public async Task<User?> GetUserByEmailAsync(string email)
+    {
+        var user = await _userRepository.GetUserByEmailAsync(email);
 
-    public async Task ResetPasswordAsync(Guid userId, string newPassword)
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+        
+        return user;
+    }
+
+    public async Task ResetPasswordAsync(Guid userId, Guid tokenId, string newPassword)
     {
         //Get user
         var user = await _userRepository.GetUserByIdAsync(userId);
@@ -92,7 +106,7 @@ public class UserService : IUserService
             throw new Exception("User not found");
         }
 
-        if (user.Password.Length < 5 || user.Password.Length > 15)
+        if (newPassword.Length < 5 || newPassword.Length > 15)
         {
             throw new Exception ("Invalid password");
         }
@@ -107,5 +121,8 @@ public class UserService : IUserService
         {
             throw new Exception("Failed to reset password");
         }
+        
+        //Set token as used
+        await _passwordTokenRepository.UpdateUsedTokenAsync(tokenId);
     }
 }

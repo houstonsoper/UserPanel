@@ -13,10 +13,12 @@ namespace userpanel.api.Controllers;
 public class UserController : Controller
 {
     private readonly IUserService _userService;
+    private readonly IPasswordTokenService _passwordTokenService;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IPasswordTokenService passwordTokenService)
     {
         _userService = userService;
+        _passwordTokenService = passwordTokenService;
     }
     
     [HttpPost ("Register")]
@@ -104,10 +106,22 @@ public class UserController : Controller
     }
 
     [HttpPost("ResetPassword")]
-    public async Task<IActionResult> ResetPassword()
+    public async Task<IActionResult> ResetPassword([FromBody] UserPasswordResetDto userPasswordResetDto)
     {
-        return Ok(new { message = "Password reset successful" });
-        
-        //TO DO
+        try
+        {
+            var token = await _passwordTokenService.GetTokenByTokenIdAsync(userPasswordResetDto.TokenId);
+
+            if (token != null)
+            {
+                await _userService.ResetPasswordAsync(token.UserId, token.TokenId, userPasswordResetDto.Password);
+                return Ok(new { message = "Password reset successful" });
+            }
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+        return BadRequest(new { message = "Unable to reset password" });
     }
 }
