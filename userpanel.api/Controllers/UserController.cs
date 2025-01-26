@@ -102,35 +102,12 @@ public class UserController : Controller
         HttpContext.Session.Remove("UserId");
         return Ok(new { message = "Logout successful" });
     }
-    
-    [HttpPost("PasswordResetToken")]
-    public async Task<IActionResult> PasswordResetToken([FromBody] CreatePasswordResetTokenDto tokenDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        //Attempt to create the token
-        try
-        {
-            var token = await _userService.CreatePasswordResetTokenAsync(tokenDto.ToPasswordResetToken());
-
-            if (token != null)
-            {
-                return Ok(token.ToPasswordResetTokenRequestDto());
-            }
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        return BadRequest(new { message = "Unable to create token" });
-    }
 
     [HttpPost("ResetPassword")]
     public async Task<IActionResult> ResetPassword()
     {
         return Ok(new { message = "Password reset successful" });
+        
+        //TO DO
     }
 }

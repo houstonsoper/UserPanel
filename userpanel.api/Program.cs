@@ -18,6 +18,8 @@ builder.Services.AddDbContext<UserPanelDbContext>(options =>
 builder.Services.AddTransient<IEmailSender,EmailSender>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPasswordTokenService, PasswordTokenService>();
+builder.Services.AddScoped<IPasswordRepository, PasswordRepository>();
 
 // Enable CORS
 builder.Services.AddCors(options =>

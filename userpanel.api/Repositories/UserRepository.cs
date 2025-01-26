@@ -32,20 +32,8 @@ public class UserRepository : IUserRepository
         return await _context.Users
             .FirstOrDefaultAsync(u => u.UserId == userId);
     }
-
-    public async Task<PasswordResetToken?> CreatePasswordResetTokenAsync(PasswordResetToken passwordResetToken)
-    {
-        await _context.PasswordResetTokens.AddAsync(passwordResetToken);
-        await _context.SaveChangesAsync();
-        return passwordResetToken;
-    }
-
-    public async Task<PasswordResetToken?> GetPasswordResetTokenAsync(Guid userId)
-    {
-        return await _context.PasswordResetTokens
-            .FirstOrDefaultAsync(u => u.UserId == userId && u.IsActive); 
-    }
-
+    
+    
     public async Task<bool> ResetPasswordAsync(User user, string hashedPassword)
     {
         //Update password and save changes to DB

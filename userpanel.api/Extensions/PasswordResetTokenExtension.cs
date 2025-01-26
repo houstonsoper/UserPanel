@@ -13,7 +13,7 @@ public static class PasswordResetTokenExtension
          UserId = token.UserId,
          CreatedAt = token.CreatedAt,
          ExpiresAt = token.ExpiresAt,
-         IsActive = token.IsActive,
+         TokenUsed = token.TokenUsed
       }; 
    }
 
@@ -33,7 +33,7 @@ public static class PasswordResetTokenExtension
          UserId = token.UserId,
          CreatedAt = DateTime.UtcNow,
          ExpiresAt = DateTime.UtcNow.AddMinutes(30),
-         IsActive = true
+         TokenUsed = false
       };
    }
 }

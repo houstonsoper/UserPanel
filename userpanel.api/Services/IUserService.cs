@@ -8,6 +8,5 @@ public interface IUserService
     public Task<User?> CreateUserAsync(UserRegistrationDto userDto);
     public Task<User?> LoginAsync(UserLoginDto userDto);
     public Task<User?> GetUserByIdAsync(Guid userId);
-    public Task<PasswordResetToken?> CreatePasswordResetTokenAsync(PasswordResetToken token);
     public Task ResetPasswordAsync(Guid userId, string hashedPassword);
 }

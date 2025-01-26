@@ -9,7 +9,8 @@ public class PasswordResetToken
     public required Guid UserId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime ExpiresAt { get; set; } = DateTime.UtcNow.AddMinutes(30);
-    public bool IsActive { get; set; } = true;
+   
+    public bool TokenUsed { get; set; } = false;
     
     //Navigation
     public User User { get; set; }

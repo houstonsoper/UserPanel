@@ -82,20 +82,6 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<PasswordResetToken?> CreatePasswordResetTokenAsync(PasswordResetToken token)
-    {
-        //Check if there is already an active token for the user
-        var existingToken = await _userRepository.GetPasswordResetTokenAsync(token.UserId);
-
-        //If no existing token create a new one
-        if (existingToken == null)
-        { 
-            return await _userRepository.CreatePasswordResetTokenAsync(token);
-        }
-        
-        return existingToken;
-    }
-
     public async Task ResetPasswordAsync(Guid userId, string newPassword)
     {
         //Get user
