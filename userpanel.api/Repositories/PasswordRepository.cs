@@ -22,7 +22,7 @@ public class PasswordRepository : IPasswordRepository
                 u.ExpiresAt > DateTime.UtcNow); 
     }
     
-    public async Task<PasswordResetToken?> CreatePasswordResetTokenAsync(PasswordResetToken passwordResetToken)
+    public async Task<PasswordResetToken> CreatePasswordResetTokenAsync(PasswordResetToken passwordResetToken)
     {
         await _context.PasswordResetTokens.AddAsync(passwordResetToken);
         await _context.SaveChangesAsync();

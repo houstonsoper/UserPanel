@@ -11,11 +11,11 @@ namespace userpanel.api.Controllers;
 
 public class PasswordResetTokenController : Controller
 {
-    private readonly IPasswordTokenService _passwordService;
+    private readonly IPasswordTokenService _passwordTokenService;
 
-    public PasswordResetTokenController(IPasswordTokenService passwordService)
+    public PasswordResetTokenController(IPasswordTokenService passwordTokenService)
     {
-        _passwordService = passwordService;
+        _passwordTokenService = passwordTokenService;
     }
     
     [HttpPost]
@@ -29,7 +29,7 @@ public class PasswordResetTokenController : Controller
         //Attempt to create the token
         try
         {
-            var token = await _passwordService.CreatePasswordResetTokenAsync(tokenDto.ToPasswordResetToken());
+            var token = await _passwordTokenService.CreatePasswordResetTokenAsync(tokenDto.ToPasswordResetToken());
 
             if (token != null)
             {

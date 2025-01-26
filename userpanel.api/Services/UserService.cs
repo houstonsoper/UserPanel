@@ -45,7 +45,7 @@ public class UserService : IUserService
             throw new Exception("Failed to create user");
         }
         //Send email to user that they have been registered on a seperate thread
-        _ = Task.Run(() => _emailSender.SendRegistrationEmail(userDto.Email, "User created"));
+        _ = Task.Run(() => _emailSender.SendRegistrationEmail(userDto.Email));
         
         return newUser;
     }

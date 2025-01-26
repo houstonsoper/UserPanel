@@ -13,5 +13,5 @@ public class PasswordResetToken
     public bool TokenUsed { get; set; } = false;
     
     //Navigation
-    public User User { get; set; }
+    public User? User { get; set; }
 }
