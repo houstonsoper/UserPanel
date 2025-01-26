@@ -19,9 +19,24 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({children}: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    //Fetch user data on mount
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const fetchedUser : User | null = await getUser();
+                setUser(fetchedUser);
+            } catch (error) {
+                console.error("Failed to fetch user", error);
+            } finally {
+                setLoading(false); 
+            }
+        };
+        fetchUser();
+    }, []);
     
-    //Logout function
+    //Logout function, clears user state and calls the logout service
     const logout = async () => {
         try {
             setLoading(true);
