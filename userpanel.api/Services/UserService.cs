@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using userpanel.api.Contexts;
-using userpanel.api.Dtos;
+using Microsoft.EntityFrameworkCore;
+using userpanel.api.DTOs;
+using userpanel.api.Exceptions;
 using userpanel.api.Models;
 using userpanel.api.Repositories;
 
@@ -40,12 +41,9 @@ public class UserService : IUserService
             Password = hashedPassword,
         };
         
-        var newUser =  await _userRepository.CreateUserAsync(user);
-
-        if (newUser == null)
-        {
-            throw new Exception("Failed to create user");
-        }
+        var newUser =  await _userRepository.CreateUserAsync(user) 
+                       ?? throw new Exception("Failed to create user");
+        
         //Send email to user that they have been registered on a seperate thread
         _ = Task.Run(() => _emailSender.SendRegistrationEmail(userDto.Email));
         
@@ -55,10 +53,8 @@ public class UserService : IUserService
     public async Task<User?> LoginAsync(UserLoginDto userDto)
     {
         //Check if the user exists 
-        var user = await _userRepository.GetUserByEmailAsync(userDto.Email);
-        if (user == null) {
-            throw new Exception("Invalid username or password");
-        }
+        var user = await _userRepository.GetUserByEmailAsync(userDto.Email) 
+                   ?? throw new Exception("Invalid username or password");
         
         //Check that their password is correct
         var passwordHasher = new PasswordHasher<User>();
@@ -66,7 +62,7 @@ public class UserService : IUserService
 
         if (result == PasswordVerificationResult.Failed)
         {
-            throw new Exception("Invalid username or password");
+            throw new InvalidUserCredentialsException("Invalid username or password");
         }
 
         return user;
@@ -74,41 +70,86 @@ public class UserService : IUserService
 
     public async Task<User?> GetUserByIdAsync(Guid userId)
     {
-        var user = await _userRepository.GetUserByIdAsync(userId);
-
-        if (user == null)
-        {
-            throw new Exception("User not found");
-        }
+        var user = await _userRepository.GetUserByIdAsync(userId) 
+                   ?? throw new Exception("User not found");
         
         return user;
     }
     
     public async Task<User?> GetUserByEmailAsync(string email)
     {
-        var user = await _userRepository.GetUserByEmailAsync(email);
-
-        if (user == null)
-        {
-            throw new Exception("User not found");
-        }
+        var user = await _userRepository.GetUserByEmailAsync(email) 
+                   ?? throw new Exception("User not found");
         
         return user;
     }
 
+    public async Task UpdateUsersGroupAsync(Guid userId, int groupId)
+    {
+        //Get the user
+        var user = await _userRepository.GetUserByIdAsync(userId)
+            ?? throw new Exception("User not found");
+        
+        //Get the usergroup
+        var userGroup = await _userRepository.GetUserGroupById(groupId)
+            ?? throw new Exception("Group not found");
+        
+        //Update the users group
+        await _userRepository.UpdateUsersGroupAsync(user, userGroup.GroupId);
+    }
+
+    public async Task<IEnumerable<User>> GetUsersAsync(int? limit, int? offset, string? search, int? groupId)
+    {
+        var query = _userRepository.GetAllUsersQuery();
+
+        //Apply search term
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query
+                .Where(u => 
+                    u.Email.ToLower().Contains(search.ToLower()) || 
+                    u.Forename.ToLower().Contains(search.ToLower()) || 
+                    u.Surname.ToLower().Contains(search.ToLower())
+                    );
+        }
+        
+        //Apply group
+        if (groupId.HasValue && groupId > 0)
+        {
+            query = query.Where(u => u.UserGroup.GroupId == groupId);
+        }
+        
+        //Apply offset (only when offset is greater than 0)
+        if (offset.HasValue && offset > 0)
+        {
+            query = query.Skip(offset.Value);
+        }
+
+        //Apply limit (only when limit is greater than 0)
+        if (limit.HasValue && limit > 0)
+        {
+            query = query.Take(limit.Value);
+        }
+
+        return await query.ToListAsync();
+    }
+
+    public async Task DeleteUserAsync(Guid userId)
+    {
+        var user = await _userRepository.GetUserByIdAsync(userId)
+            ?? throw new Exception("User not found");
+
+        await _userRepository.DeleteUserAsync(user);
+    }
+
     public async Task ResetPasswordAsync(Guid userId, Guid tokenId, string newPassword)
     {
-        //Get user
-        var user = await _userRepository.GetUserByIdAsync(userId);
-
-        if (user == null)
-        {
-            throw new Exception("User not found");
-        }
+        var user = await _userRepository.GetUserByIdAsync(userId)
+            ?? throw new Exception("User not found");
 
         if (newPassword.Length < 5 || newPassword.Length > 15)
         {
-            throw new Exception ("Invalid password");
+            throw new InvalidUserCredentialsException("Password must be between 5 and 15 characters");
         }
         
         //Hash password
@@ -118,11 +159,10 @@ public class UserService : IUserService
         var resetPassword = await _userRepository.ResetPasswordAsync(user, hashedPassword);
 
         if (!resetPassword)
-        {
             throw new Exception("Failed to reset password");
-        }
         
         //Set token as used
         await _passwordTokenRepository.UpdateUsedTokenAsync(tokenId);
     }
+    
 }

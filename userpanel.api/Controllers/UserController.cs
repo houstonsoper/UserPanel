@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using userpanel.api.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using userpanel.api.DTOs;
 using userpanel.api.Extensions;
-using userpanel.api.Models;
-using userpanel.api.Repositories;
 using userpanel.api.Services;
 
 namespace userpanel.api.Controllers;
@@ -20,8 +17,8 @@ public class UserController : Controller
         _userService = userService;
         _passwordTokenService = passwordTokenService;
     }
-    
-    [HttpPost ("Register")]
+
+    [HttpPost("Register")]
     public async Task<IActionResult> Register([FromBody] UserRegistrationDto userDto)
     {
         if (!ModelState.IsValid)
@@ -29,27 +26,36 @@ public class UserController : Controller
             return BadRequest(ModelState);
         }
 
-        //Attempt to create the user
-        try
+        //Try to create the user
+        var user = await _userService.CreateUserAsync(userDto);
+
+        if (user == null)
         {
-            var user = await _userService.CreateUserAsync(userDto);
-            
-            if (user != null)
-            { 
-                //Store session info
-                HttpContext.Session.SetString("UserId", user.UserId.ToString()); 
-                
-                return Ok(new { message = "User created successfully" });
-            }
+            return BadRequest(new { message = "Unable to create user" });
         }
-        catch (Exception ex)
+
+        //Store session info
+        HttpContext.Session.SetString("UserId", user.UserId.ToString());
+
+        return Ok(new { message = "User created successfully" });
+    }
+    
+    [HttpDelete("{userId}/Delete")]
+    public async Task<IActionResult> DeleteUser([FromRoute] string userId)
+    {
+        //Try to parse the userId into a Guid
+        if (!Guid.TryParse(userId, out Guid userGuid))
         {
-            return BadRequest(new { message = ex.Message});
+            return BadRequest("Please enter a valid Guid");
         }
-        return BadRequest(new { message = "Unable to create user" });
+        
+        //Delete the user
+        await _userService.DeleteUserAsync(userGuid);
+        
+        return Ok(new { message = "User deleted successfully" });
     }
 
-    [HttpPost ("Login")]
+    [HttpPost("Login")]
     public async Task<IActionResult> Login([FromBody] UserLoginDto userLoginDto)
     {
         if (!ModelState.IsValid)
@@ -57,46 +63,32 @@ public class UserController : Controller
             return BadRequest(ModelState);
         }
 
-        //Attempt to log the user in
-        try
+        //Try to log the user in
+        var user = await _userService.LoginAsync(userLoginDto);
+
+        if (user == null)
         {
-            var user = await _userService.LoginAsync(userLoginDto);
-            
-            if (user == null)
-            {
-                return BadRequest(new { message = "Unable to login" });
-            } 
-            
-            //Store session info
-            HttpContext.Session.SetString("UserId", user.UserId.ToString()); 
-            
-            return Ok(new { message = "Login successful" });
+            return BadRequest(new { message = "Unable to login" });
         }
-        catch (Exception ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
+
+        //Store session info
+        HttpContext.Session.SetString("UserId", user.UserId.ToString());
+        return Ok(new { message = "Login successful" });
     }
+
     [HttpGet]
     public async Task<IActionResult> GetUser()
     {
         //Get userID from the session
         var userId = HttpContext.Session.GetString("UserId");
-        
-        //Attempt to get the details of the user 
-        try
-        {
-            if (userId == null)
-            {
-                return Ok(new { message = "User is not logged in" });
-            }
-            var user = await _userService.GetUserByIdAsync(Guid.Parse(userId)); 
-            return Ok(user?.ToUserRequestDto());
-        }
-        catch (Exception ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
+
+        //If no userID is found then the user is not logged in
+        if (userId == null)
+            return Ok(new { message = "User is not logged in" });
+
+        //If there is a userId find and return the user
+        var user = await _userService.GetUserByIdAsync(Guid.Parse(userId));
+        return Ok(user?.ToUserRequestDto());
     }
 
     [HttpPost("Logout")]
@@ -109,22 +101,60 @@ public class UserController : Controller
     [HttpPost("ResetPassword")]
     public async Task<IActionResult> ResetPassword([FromBody] UserPasswordResetDto userPasswordResetDto)
     {
-        try
-        {
-            //Get the details of the password token
-            var token = await _passwordTokenService.GetTokenByTokenIdAsync(userPasswordResetDto.TokenId);
+        //Get the details of the password token
+        var token = await _passwordTokenService.GetTokenByTokenIdAsync(userPasswordResetDto.TokenId);
 
-            //If password token is valid/exists then reset the users password
-            if (token != null)
-            {
-                await _userService.ResetPasswordAsync(token.UserId, token.TokenId, userPasswordResetDto.Password);
-                return Ok(new { message = "Password reset successful" });
-            }
-        }
-        catch (Exception ex)
+        //If password token is valid/exists then reset the users password
+        if (token != null)
         {
-            return Unauthorized(new { message = ex.Message });
+            await _userService.ResetPasswordAsync(token.UserId, token.TokenId, userPasswordResetDto.Password);
+            return Ok(new { message = "Password reset successful" });
         }
+
         return BadRequest(new { message = "Unable to reset password" });
+    }
+
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUserById(string userId)
+    {
+        if (!Guid.TryParse(userId, out var userGuid))
+        {
+            return BadRequest(new { message = "Please enter a valid Guid" });
+        }
+
+        var user = await _userService.GetUserByIdAsync(userGuid);
+
+        if (user == null)
+            return BadRequest(new { message = "Unable to find user" });
+
+        return Ok(user.ToUserRequestDto());
+    }
+
+    [HttpPut("{userId}/Group")]
+    public async Task<IActionResult> UpdateUsersGroup([FromRoute] string userId,
+        [FromBody] UserGroupUpdateDto userGroupUpdateDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (!Guid.TryParse(userId, out var userGuid))
+        {
+            return BadRequest(new { message = "Please enter a valid Guid" });
+        }
+
+        //Update the users group
+        await _userService.UpdateUsersGroupAsync(userGuid, userGroupUpdateDto.GroupId);
+
+        return Ok(new { message = "User group updated successfully" });
+}
+
+    [HttpGet("/Users")]
+    public async Task<IActionResult> GetUsers([FromQuery] int? limit, [FromQuery] int? offset, [FromQuery] string? search ,[FromQuery] int groupId)
+    {
+        var users = await _userService.GetUsersAsync(limit, offset, search, groupId);
+        var usersDto = users.Select(u => u.ToUserRequestDto());
+        return Ok(usersDto);
     }
 }

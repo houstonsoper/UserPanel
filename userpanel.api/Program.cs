@@ -1,3 +1,4 @@
+using userpanel.api.Middleware;
 using Microsoft.EntityFrameworkCore;
 using userpanel.api.Contexts;
 using userpanel.api.Repositories;
@@ -18,8 +19,10 @@ builder.Services.AddDbContext<UserPanelDbContext>(options =>
 builder.Services.AddTransient<IEmailSender,EmailSender>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserGroupRepository, UserGroupRepository>();
 builder.Services.AddScoped<IPasswordTokenService, PasswordTokenService>();
 builder.Services.AddScoped<IPasswordTokenRepository, PasswordTokenRepository>();
+builder.Services.AddTransient<GlobalExceptionHandlerMiddleware>();
 
 // Enable CORS
 builder.Services.AddCors(options =>
@@ -57,6 +60,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors("AllowSpecificOrigin");
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 app.UseHttpsRedirection();
 app.UseSession();
 app.UseRouting();

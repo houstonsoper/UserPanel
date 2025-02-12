@@ -1,4 +1,4 @@
-﻿using userpanel.api.Dtos;
+﻿using userpanel.api.DTOs;
 using userpanel.api.Models;
 
 namespace userpanel.api.Extensions;
@@ -24,6 +24,7 @@ public static class UserExtension
             Forename = user.Forename,
             Surname = user.Surname,
             Email = user.Email,
+            UserGroup = user.UserGroup,
         };
     }
 

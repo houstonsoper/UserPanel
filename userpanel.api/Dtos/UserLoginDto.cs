@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace userpanel.api.Dtos;
+namespace userpanel.api.DTOs;
 
 public class UserLoginDto
 {

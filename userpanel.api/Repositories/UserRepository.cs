@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using userpanel.api.Contexts;
-using userpanel.api.Dtos;
 using userpanel.api.Models;
 
 namespace userpanel.api.Repositories;
@@ -23,13 +22,15 @@ public class UserRepository : IUserRepository
     
     public async Task<User?> GetUserByEmailAsync(string email)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        return user;
+        return await _context.Users
+            .Include(u => u.UserGroup)
+            .FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<User?> GetUserByIdAsync(Guid userId)
     {
         return await _context.Users
+            .Include(u => u.UserGroup)
             .FirstOrDefaultAsync(u => u.UserId == userId);
     }
     
@@ -41,5 +42,29 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync();
         
         return true;
+    }
+
+    public async Task UpdateUsersGroupAsync(User user, int groupId)
+    {
+        user.UserGroupId = groupId;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task <UserGroup?> GetUserGroupById(int groupId)
+    {
+        return await _context.UserGroups.FindAsync(groupId);
+    }
+
+    public IQueryable<User> GetAllUsersQuery()
+    {
+        return _context.Users
+            .Include(u => u.UserGroup)
+            .AsQueryable();
+    }
+
+    public async Task DeleteUserAsync(User user)
+    {
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
     }
 }

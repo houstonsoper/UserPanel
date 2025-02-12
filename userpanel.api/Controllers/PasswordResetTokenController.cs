@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using userpanel.api.Dtos;
+using userpanel.api.DTOs;
 using userpanel.api.Extensions;
 using userpanel.api.Models;
 using userpanel.api.Repositories;

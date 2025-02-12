@@ -8,6 +8,7 @@ public class UserPanelDbContext : DbContext
 {
     public DbSet<User> Users { get; set; }
     public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+    public DbSet<UserGroup> UserGroups { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

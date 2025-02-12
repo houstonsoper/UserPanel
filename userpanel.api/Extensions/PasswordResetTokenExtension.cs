@@ -1,4 +1,4 @@
-﻿using userpanel.api.Dtos;
+﻿using userpanel.api.DTOs;
 using userpanel.api.Models;
 
 namespace userpanel.api.Extensions;
